@@ -19,10 +19,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install and Build
-        run: |
-          cd playground
-          pnpm install
-          pnpm run build
+        run: cd playground pnpm install && pnpm run build
           
       - name: Commit files
         run: |

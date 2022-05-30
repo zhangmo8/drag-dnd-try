@@ -24,6 +24,7 @@ const onDragEnter = (e: DragEvent) => {
 
 const onDragLeave = (e: DragEvent) => {
   dropStatus.value = 'none'
+  e.dataTransfer!.dropEffect = 'none'
   emits('dragleave', e)
 }
 
@@ -42,7 +43,7 @@ const onDrop = (e: DragEvent) => {
 
 <template>
   <div
-    @dragenter="onDragEnter"
+    @dragenter.self="onDragEnter"
     @dragleave.self="onDragLeave"
     @dragover.prevent="onDragOver"
     @drop="onDrop"

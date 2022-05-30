@@ -46,7 +46,8 @@ const onDragEnd = (e: DragEvent) => {
 
 <template>
   <div
-    :draggable="!disabled" transition-opacity :class="{ 'op-70': dragStatus === 'drag' }"
+    :draggable="!disabled" transition-opacity
+    :class="{ 'op-70': dragStatus === 'drag' }"
     @dragstart.passive="onDragStart"
     @drag="onDrag"
     @dragover.prevent=""

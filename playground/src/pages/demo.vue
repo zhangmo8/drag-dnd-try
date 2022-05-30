@@ -31,10 +31,10 @@ const onSortDrag = (el: any, i: number) => {
   <div flex>
     <div w-80 flex justify-around gap-1 flex-wrap items-center h-screen bg-red m-r-10>
       <Drag
-        v-for="item in 16"
+        v-for="item in 18"
         :key="item"
         :drag-data="item"
-        draggable="true" w-20 h-20 lh-20 text-center bg-yellow transition-opacity
+        w-20 h-20 lh-20 text-center bg-yellow transition-opacity
       >
         {{ item }}
       </Drag>

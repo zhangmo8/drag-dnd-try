@@ -1,6 +1,9 @@
 name: CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   test:
@@ -23,7 +26,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Report coverage to Codecov
-        uses: codecov/codecov-action@v1
+      - name: Deploy to netlify
+        uses: netlify/actions/cli@master
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          args: deploy --dir=public --prod
+        env:
+          NETLIFY_SITE_ID: ${{ secrets.DEV_NETLIFY_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}

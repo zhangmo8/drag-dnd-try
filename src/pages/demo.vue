@@ -3,6 +3,7 @@ const renderSchema = reactive<string[]>([])
 const dropType = ref('copy')
 const dropDom = ref()
 
+// TODO: 放下后才加入元素导致了，左边新增拖拽和中间排序拖拽产生了一些问题，左边新增到中间的时候已经出发排序，而并没有放下，则触发了一个假的排序，导致拿不到data，渲染发生问题
 const onDrop = (e: DragEvent, data: any) => {
   data && renderSchema.push(data)
 }
@@ -45,24 +46,25 @@ const onSortDrag = (el: any, i: number) => {
       @drop="onDrop"
       @dragenter="onDropEnter"
     >
-      <transition-group name="drag" tag="div" class="move-list">
-        <Drag
-          v-for="(item, i) in renderSchema"
-          :key="item"
-          flex-inline
-          bg-yellow
-          w-30 h-30 lh-30
-          border b-red
-          justify-center
-          items-center
-          cursor-move
-          @dragstart="onDragStart(item)"
-          @dragend="onDragEnd(item)"
-          @dragenter.stop="onSortDrag(item, i)"
-        >
-          {{ item }}
-        </Drag>
-      </transition-group>
+      <!-- TODO:这里考虑是否需要重新加入一个DragGroup来兼容排序情况，暂时先去除动画保证排序正常运行 -->
+      <!-- <transition-group name="drag" tag="div" class="move-list"> -->
+      <Drag
+        v-for="(item, i) in renderSchema"
+        :key="item"
+        flex-inline
+        bg-yellow
+        w-30 h-30 lh-30
+        border b-red
+        justify-center
+        items-center
+        cursor-move
+        @dragstart="onDragStart(item)"
+        @dragend="onDragEnd(item)"
+        @dragenter.stop="onSortDrag(item, i)"
+      >
+        {{ item }}
+      </Drag>
+      <!-- </transition-group> -->
     </Drop>
     <div w-80 h-screen w-40 h-40 bg-pink m-l-10 />
   </div>

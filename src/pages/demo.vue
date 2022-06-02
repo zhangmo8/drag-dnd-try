@@ -46,25 +46,25 @@ const onSortDrag = (el: any, i: number) => {
       @drop="onDrop"
       @dragenter="onDropEnter"
     >
-      <!-- TODO:这里考虑是否需要重新加入一个DragGroup来兼容排序情况，暂时先去除动画保证排序正常运行 -->
-      <!-- <transition-group name="drag" tag="div" class="move-list"> -->
-      <Drag
-        v-for="(item, i) in renderSchema"
-        :key="item"
-        flex-inline
-        bg-yellow
-        w-30 h-30 lh-30
-        border b-red
-        justify-center
-        items-center
-        cursor-move
-        @dragstart="onDragStart(item)"
-        @dragend="onDragEnd(item)"
-        @dragenter.stop="onSortDrag(item, i)"
-      >
-        {{ item }}
-      </Drag>
-      <!-- </transition-group> -->
+      <!-- TODO:这里考虑是否需要重新加入一个DragGroup来兼容排序情况 -->
+      <transition-group name="drag" tag="div" class="move-list">
+        <Drag
+          v-for="(item, i) in renderSchema"
+          :key="item"
+          flex-inline
+          bg-yellow
+          w-30 h-30 lh-30
+          border b-red
+          justify-center
+          items-center
+          cursor-move
+          @dragstart="onDragStart(item)"
+          @dragend="onDragEnd(item)"
+          @dragenter.stop="onSortDrag(item, i)"
+        >
+          {{ item }}
+        </Drag>
+      </transition-group>
     </Drop>
     <div w-80 h-screen w-40 h-40 bg-pink m-l-10 />
   </div>
@@ -73,5 +73,6 @@ const onSortDrag = (el: any, i: number) => {
 <style>
 .drag-move{
   transition: transform .5s;
+  pointer-events: none;
 }
 </style>

@@ -38,6 +38,9 @@ const onDragEnter = (e: DragEvent) => {
   emit('dragenter', e)
 }
 
+const onDragOver = (e: DragEvent) => {
+}
+
 const onDragEnd = (e: DragEvent) => {
   dragStatus.value = 'none'
   emit('dragend', e)
@@ -50,7 +53,7 @@ const onDragEnd = (e: DragEvent) => {
     :class="{ 'op-70': dragStatus === 'drag' }"
     @dragstart.passive="onDragStart"
     @drag="onDrag"
-    @dragover.prevent=""
+    @dragover.prevent="onDragOver"
     @dragenter.stop="onDragEnter"
     @dragend="onDragEnd"
   >

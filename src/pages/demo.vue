@@ -13,18 +13,16 @@ const onDragStart = (item: any) => {
   dropDom.value = item
 }
 
-const onDragEnd = (item: any) => {
+const onDragEnd = (item: any, i) => {
+  const index = renderSchema.findIndex(item => item === dropDom.value)
+  renderSchema.splice(index, 1)
+  renderSchema.splice(i, 0, dropDom.value)
   // renderSchema.splice(dropDom.value, 1)
 }
 
 const onDropEnter = () => { }
 
 const onSortDrag = (el: any, i: number) => {
-  if (dropDom.value !== el) {
-    const index = renderSchema.findIndex(item => item === dropDom.value)
-    renderSchema.splice(index, 1)
-    renderSchema.splice(i, 0, dropDom.value)
-  }
 }
 </script>
 
@@ -40,7 +38,7 @@ const onSortDrag = (el: any, i: number) => {
       <transition-group name="drag" tag="div" class="move-list">
         <Drag
           v-for="(item, i) in renderSchema" :key="item" flex-inline bg-yellow w-30 h-30 lh-30 border b-red
-          justify-center items-center cursor-move @dragstart="onDragStart(item)" @dragend="onDragEnd(item)"
+          justify-center items-center cursor-move @dragstart="onDragStart(item)" @dragend="onDragEnd(item, i)"
           @dragover.prevent="onSortDrag(item, i)"
         >
           {{ item }}

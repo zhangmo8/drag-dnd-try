@@ -10,22 +10,21 @@ const onDrop = (e: DragEvent, data: any) => {
 
 const onDragStart = (item: any) => {
   dropType.value = 'move'
-  dropDom.value = item
 }
 
-const onDragEnd = (item: any) => {
+const onDragEnd = (el: any, i: number) => {
+  const index = renderSchema.findIndex(item => item === dropDom.value)
+  renderSchema.splice(i, 1)
+  renderSchema.splice(index, 0, el)
   // renderSchema.splice(dropDom.value, 1)
 }
 
-const onDropEnter = () => { }
-
-const onSortDrag = (el: any, i: number) => {
-  if (dropDom.value !== el) {
-    const index = renderSchema.findIndex(item => item === dropDom.value)
-    renderSchema.splice(index, 1)
-    renderSchema.splice(i, 0, dropDom.value)
-  }
+const onDragEnter = (item: any) => {
+  dropDom.value = item
 }
+
+// TODO: 去除中间态排序，放下时才真正change
+const onDropEnter = (item: any) => { }
 </script>
 
 <template>
@@ -59,9 +58,10 @@ const onSortDrag = (el: any, i: number) => {
           items-center
           cursor-move
           @dragstart="onDragStart(item)"
-          @dragend="onDragEnd(item)"
-          @dragenter.stop="onSortDrag(item, i)"
+          @dragenter="onDragEnter(item)"
+          @dragend="onDragEnd(item, i)"
         >
+          <!-- @dragenter.stop="onSortDrag(item, i)" -->
           {{ item }}
         </Drag>
       </transition-group>

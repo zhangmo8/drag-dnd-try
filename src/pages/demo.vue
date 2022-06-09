@@ -3,9 +3,15 @@ const renderSchema = reactive<string[]>([])
 const dropType = ref('copy')
 const dropDom = ref()
 
-// TODO: 放下后才加入元素导致了，左边新增拖拽和中间排序拖拽产生了一些问题，左边新增到中间的时候已经出发排序，而并没有放下，则触发了一个假的排序，导致拿不到data，渲染发生问题
 const onDrop = (e: DragEvent, data: any) => {
-  data && renderSchema.push(data)
+  if (data) {
+    if (dropDom.value) {
+      const index = renderSchema.findIndex(item => item === dropDom.value)
+      renderSchema.splice(index, 0, data)
+    }
+    else { renderSchema.push(data) }
+    dropDom.value = null
+  }
 }
 
 const onDragStart = (item: any) => {
@@ -16,11 +22,13 @@ const onDragEnd = (el: any, i: number) => {
   const index = renderSchema.findIndex(item => item === dropDom.value)
   renderSchema.splice(i, 1)
   renderSchema.splice(index, 0, el)
+  dropDom.value = null
+
   // renderSchema.splice(dropDom.value, 1)
 }
 
 const onDragEnter = (item: any) => {
-  dropDom.value = item
+  dropDom.value = item.toString()
 }
 
 // TODO: 去除中间态排序，放下时才真正change
@@ -30,36 +38,17 @@ const onDropEnter = (item: any) => { }
 <template>
   <div flex>
     <div w-80 flex justify-around gap-1 flex-wrap items-center h-screen bg-red m-r-10>
-      <Drag
-        v-for="item in 18"
-        :key="item"
-        :drag-data="item"
-        w-20 h-20 lh-20 text-center bg-yellow transition-opacity
-      >
+      <Drag v-for="item in 18" :key="item" :drag-data="item" w-20 h-20 lh-20 text-center bg-yellow transition-opacity>
         {{ item }}
       </Drag>
     </div>
-    <Drop
-      flex-1 bg-blue transition-colors
-      :type="dropType"
-      @drop="onDrop"
-      @dragenter="onDropEnter"
-    >
+    <Drop flex-1 bg-blue transition-colors :type="dropType" @drop="onDrop" @dragenter="onDropEnter">
       <!-- TODO:这里考虑是否需要重新加入一个DragGroup来兼容排序情况 -->
       <transition-group name="drag" tag="div" class="move-list">
         <Drag
-          v-for="(item, i) in renderSchema"
-          :key="item"
-          flex-inline
-          bg-yellow
-          w-30 h-30 lh-30
-          border b-red
-          justify-center
-          items-center
-          cursor-move
-          @dragstart="onDragStart(item)"
-          @dragenter="onDragEnter(item)"
-          @dragend="onDragEnd(item, i)"
+          v-for="(item, i) in renderSchema" :key="item" flex-inline bg-yellow w-30 h-30 lh-30 border b-red
+          justify-center items-center cursor-move @dragstart="onDragStart(item)" @dragenter="onDragEnter(item)"
+          @dragend.prevent="onDragEnd(item, i)"
         >
           <!-- @dragenter.stop="onSortDrag(item, i)" -->
           {{ item }}
@@ -71,7 +60,7 @@ const onDropEnter = (item: any) => { }
 </template>
 
 <style>
-.drag-move{
+.drag-move {
   transition: transform .5s;
   pointer-events: none;
 }

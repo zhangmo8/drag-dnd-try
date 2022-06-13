@@ -1,54 +1,81 @@
 <script setup lang="ts">
 const renderSchema = reactive<string[]>([])
 const dropType = ref('copy')
+const dragType = ref('add')
+
+const dropEnterStatus = ref<'enter' | 'leave' | 'none'>('none')
 const dropDom = ref()
 
+const onDragStart = (el: any) => {
+  dropDom.value = el
+  dragType.value = 'add'
+  dropEnterStatus.value = 'none'
+}
+
+const onDragSortStart = (item: any) => {
+  dropType.value = 'move'
+  dropDom.value = item
+  dragType.value = 'sort'
+}
+
+const onDragSortEnter = (el: any, i: number) => {
+  dragType.value = 'sort'
+  const index = renderSchema.findIndex(item => item === dropDom.value)
+  if (index !== -1)
+    renderSchema.splice(index, 1)
+
+  else dropEnterStatus.value = 'enter'
+  renderSchema.splice(i, 0, dropDom.value)
+}
+
+const onDragSortEnd = (item: any) => {
+  dropDom.value = null
+  dragType.value = 'none'
+  dropEnterStatus.value = 'none'
+}
+
 const onDrop = (e: DragEvent, data: any) => {
-  if (data) {
-    if (dropDom.value) {
-      const index = renderSchema.findIndex(item => item === dropDom.value)
-      renderSchema.splice(index, 0, data)
-    }
-    else { renderSchema.push(data) }
-    dropDom.value = null
+  dropDom.value = null
+  dragType.value = 'none'
+  dropEnterStatus.value = 'none'
+}
+
+const onDropEnter = (item: any) => {
+  if (dragType.value !== 'sort') {
+    dropEnterStatus.value = 'enter'
+    dragType.value = 'sort'
+    dropDom.value && renderSchema.push(dropDom.value)
   }
 }
 
-const onDragStart = (item: any) => {
-  dropType.value = 'move'
+const onDropLeave = (item: any) => {
+  if (dragType.value === 'add') {
+    dropEnterStatus.value = 'leave'
+    const index = renderSchema.findIndex(item => item === dropDom.value)
+    renderSchema.splice(index, 1)
+  }
 }
-
-const onDragEnd = (el: any, i: number) => {
-  const index = renderSchema.findIndex(item => item === dropDom.value)
-  renderSchema.splice(i, 1)
-  renderSchema.splice(index, 0, el)
-  dropDom.value = null
-
-  // renderSchema.splice(dropDom.value, 1)
-}
-
-const onDragEnter = (item: any) => {
-  dropDom.value = item.toString()
-}
-
-// TODO: 去除中间态排序，放下时才真正change
-const onDropEnter = (item: any) => { }
 </script>
 
 <template>
   <div flex>
     <div w-80 flex justify-around gap-1 flex-wrap items-center h-screen bg-red m-r-10>
-      <Drag v-for="item in 18" :key="item" :drag-data="item" w-20 h-20 lh-20 text-center bg-yellow transition-opacity>
+      <Drag
+        v-for="item in 18" :key="item" :drag-data="item" w-20 h-20 lh-20 text-center bg-yellow transition-opacity
+        @dragstart="onDragStart(item)"
+      >
         {{ item }}
       </Drag>
     </div>
-    <Drop flex-1 bg-blue transition-colors :type="dropType" @drop="onDrop" @dragenter="onDropEnter">
-      <!-- TODO:这里考虑是否需要重新加入一个DragGroup来兼容排序情况 -->
+    <Drop
+      flex-1 bg-blue transition-colors :type="dropType" @drop="onDrop" @dragenter="onDropEnter"
+      @dragleave="onDropLeave"
+    >
       <transition-group name="drag" tag="div" class="move-list">
         <Drag
           v-for="(item, i) in renderSchema" :key="item" flex-inline bg-yellow w-30 h-30 lh-30 border b-red
-          justify-center items-center cursor-move @dragstart="onDragStart(item)" @dragenter="onDragEnter(item)"
-          @dragend.prevent="onDragEnd(item, i)"
+          justify-center items-center cursor-move @dragstart="onDragSortStart(item)"
+          @dragenter="onDragSortEnter(item, i)" @dragend="onDragSortEnd"
         >
           <!-- @dragenter.stop="onSortDrag(item, i)" -->
           {{ item }}

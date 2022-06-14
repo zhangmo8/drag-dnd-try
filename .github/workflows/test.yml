@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 6
+
+      - name: Set node version to 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Deploy to netlify
+        uses: netlify/actions/cli@master
+        with:
+          args: deploy --dir=dist --prod
+        env:
+          NETLIFY_SITE_ID: ${{ secrets.DEV_NETLIFY_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
